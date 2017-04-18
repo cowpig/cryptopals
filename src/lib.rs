@@ -5,19 +5,34 @@ pub const BASE_64: [char; 64] = [
 	'5','6','7','8','9','+','/'
 ];
 
-pub const HEX: [char; 16] = [
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
-];
+pub const HEX: &'static[u8] = b"0123456789abcdef";
 
-fn add_triplet<'a>(output: &'a mut String, byte0: u8, byte1: u8, byte2: u8) -> &'a mut String {
-	let digit = |byte| {
-		// println!("converting {:08b} ({})", byte, byte);
+fn hex_to_bytes(hex: String){
+	// TODO: do this for BYTES instead of NYBBLES and refactor the add_triplet code
 		let dig = match byte {
 			48...57 => (byte - 48) as usize, // 0 thru 9
 			97...102 => (byte - 87) as usize, // a thru f
 			65...70 => (byte - 55) as usize, // A thru F
 			_ => panic!("invalid hex str")
 		};
+}
+
+fn bytes_to_hex(bytes: &[u8]) -> String {
+    let mut v = Vec::with_capacity(bytes.len() * 2);
+    for &byte in bytes.iter() {
+        v.push(HEX[(byte >> 4) as usize]);
+        v.push(HEX[(byte & 0xf) as usize]);
+    }
+
+    unsafe {
+        String::from_utf8_unchecked(v)
+    }
+}
+
+fn add_triplet<'a>(output: &'a mut String, byte0: u8, byte1: u8, byte2: u8) -> &'a mut String {
+	let digit = |byte| {
+		// println!("converting {:08b} ({})", byte, byte);
+
 		// println!("converts to {:04b} ({})", dig, dig);
 		dig
 	};
